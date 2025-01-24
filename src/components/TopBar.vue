@@ -12,16 +12,44 @@
     <v-btn icon>
       <v-icon>mdi-bell</v-icon>
     </v-btn>
-    <v-btn icon>
-      <v-icon>mdi-account</v-icon>
-    </v-btn>
+
+    <v-menu>
+      <template v-slot:activator="{ props }">
+        <v-btn icon v-bind="props">
+          <v-icon>mdi-account</v-icon>
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item @click="logout">
+          <v-list-item-title>Logout</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
+
   </v-app-bar>
 </template>
 
-<script>
-export default {
-  name: 'TopBar',
-};
+<script setup>
+import { inject } from 'vue';
+import { useRouter } from 'vue-router';
+
+// Reactive state for the menu visibility
+
+
+// Inject the isLoggedIn state and updateUserId function
+const isLoggedIn = inject('isLoggedIn');
+const updateUserId = inject('updateUserId');
+
+// Logout function
+function logout() {
+  // Clear local storage or handle your logout logic
+  localStorage.removeItem('userId');
+  // Update the userId to null (which will update isLoggedIn)
+  updateUserId(null);
+  // Optionally, redirect the user to the login page
+  router.push('/login');
+}
 </script>
 
 <style scoped>

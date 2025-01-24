@@ -17,7 +17,7 @@ import { createApp } from 'vue'
 const app = createApp(App)
 
  // Use the router
-
-registerPlugins(app)
 app.use(router);
+registerPlugins(app)
+
 app.mount('#app')

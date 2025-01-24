@@ -7,7 +7,7 @@
 
     <v-list density="compact" nav>
       <!-- Dashboard -->
-      <v-list-item link to="/">
+      <v-list-item link to="/dashboard">
         <template v-slot:prepend>
           <v-icon icon="mdi-view-dashboard" color="white"></v-icon>
         </template>
