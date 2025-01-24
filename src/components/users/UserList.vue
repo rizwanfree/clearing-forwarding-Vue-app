@@ -46,7 +46,7 @@
     </v-card>
 
     <!-- Add User Modal -->
-    <v-dialog v-model="isAddUserModalOpen" max-width="600">
+    <v-dialog v-model="isAddUserModalOpen" style="width: 500px;">
       <v-card>
         <v-card-title class="text-center">Add New User</v-card-title>
         <v-card-text>
@@ -71,7 +71,7 @@
     </v-dialog>
 
     <!-- Edit User Modal -->
-    <v-dialog v-model="isEditUserModalOpen" max-width="600">
+    <v-dialog v-model="isEditUserModalOpen" max-width="500">
       <v-card>
         <v-card-title class="text-center">Edit User</v-card-title>
         <v-card-text>
@@ -85,11 +85,10 @@
               class="mb-3"></v-text-field>
 
             <v-select v-model="editUserData.role" :items="roles" label="Role" outlined class="mb-3"></v-select>
-
-            <v-btn type="submit" color="primary" :loading="isSubmitting">
-              Save Changes
-            </v-btn>
-            <v-btn @click="closeEditUserModal" class="ml-2">Cancel</v-btn>
+              <div class="flex justify-center">
+                <v-btn type="submit" color="primary" :loading="isSubmitting">Save</v-btn>
+                <v-btn @click="closeEditUserModal" class="ml-2">Cancel</v-btn>
+              </div>
           </v-form>
         </v-card-text>
       </v-card>
@@ -129,7 +128,7 @@ export default {
     // Fetch users from the API
     async fetchUsers() {
       try {
-        const response = await fetch('http://localhost:3002/users');
+        const response = await fetch('http://localhost:3002/users?tenantId=1');
         if (!response.ok) {
           throw new Error('Failed to fetch users');
         }
