@@ -37,16 +37,16 @@ const router = createRouter({
 
 
 router.beforeEach((to, from, next) => {
-  const userId = localStorage.getItem('userId');
-  console.log(`Navigating from ${from.path} to ${to.path}. userId: ${userId}`); // Debugging
+  // Check if the access token exists in localStorage
+  const accessToken = localStorage.getItem('accessToken');
 
-  if (to.meta.requiresAuth && !userId) {
+  console.log(`Navigating from ${from.path} to ${to.path}. accessToken: ${accessToken}`); // Debugging
+
+  if (to.meta.requiresAuth && !accessToken) {
     next('/login'); // Redirect to login if not authenticated
-  }
-  else if (to.meta.requiresAuth && userId === null){
-    next('/login'); // Redirect to login if not authenticated
-  }
-  else {
+  } else if (to.name === 'Login' && accessToken) {
+    next('/'); // Redirect to dashboard if already logged in
+  } else {
     next(); // Proceed to the route
   }
 });

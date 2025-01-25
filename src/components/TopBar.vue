@@ -25,8 +25,6 @@
         </v-list-item>
       </v-list>
     </v-menu>
-
-
   </v-app-bar>
 </template>
 
@@ -34,22 +32,10 @@
 import { inject } from 'vue';
 import { useRouter } from 'vue-router';
 
-// Reactive state for the menu visibility
+const router = useRouter();
 
-
-// Inject the isLoggedIn state and updateUserId function
-const isLoggedIn = inject('isLoggedIn');
-const updateUserId = inject('updateUserId');
-
-// Logout function
-function logout() {
-  // Clear local storage or handle your logout logic
-  localStorage.removeItem('userId');
-  // Update the userId to null (which will update isLoggedIn)
-  updateUserId(null);
-  // Optionally, redirect the user to the login page
-  router.push('/login');
-}
+// Inject the logout function from App.vue
+const logout = inject('logout');
 </script>
 
 <style scoped>

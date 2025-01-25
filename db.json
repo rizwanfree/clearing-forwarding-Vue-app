@@ -36,38 +36,21 @@
     {
       "id": "7421",
       "tenantId": "2",
-      "name": "Rizwan",
+      "fullName": "Rizwan",
       "email": "rizwansoomro@gmail.com",
+      "username": "rizwan-1942@1045149",
       "password": "admin112",
       "role": "admin",
       "createdAt": "2025-01-23T23:43:07.180Z",
       "updatedAt": "2025-01-23T23:43:07.180Z"
     },
+
     {
-      "id": "a148",
-      "tenantId": "2",
-      "name": "Junaid",
-      "email": "junaid@gmail.com",
-      "password": "junaid",
-      "role": "user",
-      "createdAt": "2025-01-23T23:47:14.192Z",
-      "updatedAt": "2025-01-23T23:47:14.192Z"
-    },
-    {
-      "id": "2434",
-      "tenantId": "2",
-      "name": "Yasir Soomro",
-      "email": "arif_yasir@gmail.com",
-      "password": "yasir112",
-      "role": "user",
-      "createdAt": "2025-01-24T00:00:17.650Z",
-      "updatedAt": "2025-01-24T00:00:17.650Z"
-    },
-    {
-      "id": "02c0",
+      "id": "02c0",   
       "tenantId": "1",
-      "name": "Faisal",
+      "fullName": "Faisal",
       "email": "faisal@gmail.com",
+      "username": "faisal-1509@1045149",
       "password": "admin112",
       "role": "user",
       "createdAt": "2025-01-24T10:56:44.803Z",

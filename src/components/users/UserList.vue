@@ -13,6 +13,7 @@
           <thead style="font-weight: bolder;">
             <tr>
               <th hidden>ID</th>
+              <th>Username</th>
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
@@ -23,7 +24,8 @@
           <tbody>
             <tr v-for="user in users" :key="user.id">
               <td hidden>{{ user.id }}</td>
-              <td>{{ user.name }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.fullName }}</td>
               <td>{{ user.email }}</td>
               <td>
                 <v-chip class="text-center" :color="user.role === 'admin' ? 'primary' : 'success'" small>
@@ -85,10 +87,10 @@
               class="mb-3"></v-text-field>
 
             <v-select v-model="editUserData.role" :items="roles" label="Role" outlined class="mb-3"></v-select>
-              <div class="flex justify-center">
-                <v-btn type="submit" color="primary" :loading="isSubmitting">Save</v-btn>
-                <v-btn @click="closeEditUserModal" class="ml-2">Cancel</v-btn>
-              </div>
+            <div class="flex justify-center">
+              <v-btn type="submit" color="primary" :loading="isSubmitting">Save</v-btn>
+              <v-btn @click="closeEditUserModal" class="ml-2">Cancel</v-btn>
+            </div>
           </v-form>
         </v-card-text>
       </v-card>

@@ -6,8 +6,9 @@
           <v-card-title class="text-h6">Login Page</v-card-title>
           <v-card-text>
             <form @submit.prevent="login">
-              <v-text-field v-model="username" label="Username" outlined required></v-text-field>
-              <v-text-field v-model="password" label="Password" type="password" outlined required></v-text-field>
+              <v-text-field v-model="username" label="Username" name="username" outlined required></v-text-field>
+              <v-text-field v-model="password" label="Password" name="password" type="password" outlined
+                required></v-text-field>
 
               <v-btn type="submit" color="primary" block class="mt-4" :disabled="isLoading">
                 <span v-if="isLoading">Logging In...</span>
@@ -28,79 +29,58 @@
 import { ref, inject } from 'vue';
 import { useRouter } from 'vue-router';
 
-const username = ref("");
-const password = ref("");
-const error = ref("");
+const username = ref('');
+const password = ref('');
+const error = ref('');
 const isLoading = ref(false);
 const router = useRouter();
 
-// Inject the isLoggedIn state and updateUserId function
-const isLoggedIn = inject('isLoggedIn');
-const updateUserId = inject('updateUserId');
+// Inject the updateToken function from App.vue
+const updateToken = inject('updateToken');
 
 async function login() {
   if (!username.value || !password.value) {
-    error.value = "Please fill in both fields.";
+    error.value = 'Please fill in both fields.';
     return;
   }
 
   isLoading.value = true;
-  error.value = "";
-
-  // Split the username into admin, license, and NTN
-  const res = username.value.split('-');
-  const uname = res[0]; // e.g., "admin"
-  const licenseNtn = res[1].split('@');
-  const license = licenseNtn[0]; // e.g., "1509"
-  const ntn = licenseNtn[1]; // e.g., "1045149"
+  error.value = '';
 
   try {
-    // Step 1: Validate the license and NTN in the agents table
-    const agentResponse = await fetch(
-      `http://localhost:3002/agents?license=${license}&ntn=${ntn}`
-    );
-    if (!agentResponse.ok) {
-      throw new Error(`HTTP ERROR! Status: ${agentResponse.status}`);
+    const response = await fetch('http://localhost:8000/api/accounts/login/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Invalid credentials');
     }
 
-    const agentData = await agentResponse.json();
-    console.log('Agent Data:', agentData);
+    const { access } = await response.json();
+    console.log('Login successful. Token:', access);
 
-    if (agentData.length === 0) {
-      error.value = 'Invalid company details (License or NTN mismatch).';
-      return;
-    }
+    // Update the token using the provided function
+    updateToken(access);
 
-    const agent = agentData[0];
-
-    // Step 2: Validate the user within the specified company
-    const userResponse = await fetch(
-      `http://localhost:3002/users?name=${uname}&password=${password.value}&tenantId=${agent.id}`
-    );
-    if (!userResponse.ok) {
-      throw new Error(`HTTP ERROR! Status: ${userResponse.status}`);
-    }
-
-    const userData = await userResponse.json();
-    console.log('User Data:', userData);
-
-    if (userData.length > 0) {
-      // Update the userId using the provided function
-      updateUserId(userData[0].id);
-      console.log('Login Successful. Redirecting to dashboard...');
-
-      // Navigate to dashboard
-      await router.push('/dashboard');
-    } else {
-      error.value = 'User not found in the specified company.';
-    }
+    // Navigate to the dashboard
+    await router.push('/dashboard');
   } catch (err) {
     console.error('Error during login:', err);
-    error.value = 'An unexpected error occurred during login.';
+    error.value = err.message;
   } finally {
     isLoading.value = false;
   }
 }
+
+
 </script>
 
 <style scoped>
