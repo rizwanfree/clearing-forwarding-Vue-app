@@ -4,11 +4,10 @@ import Dashboard from '@/components/Dashboard.vue';
 import Login from '@/components/users/Login.vue';
 
 const routes = [
-    {
+  // Redirect from '/' to '/dashboard'
+  {
     path: '/',
-    name: 'Dashboard',
-    component: Dashboard,
-    meta: { requiresAuth: true },
+    redirect: '/dashboard', // Redirect to /dashboard when accessing the root path
   },
   {
     path: '/login',
@@ -34,20 +33,23 @@ const router = createRouter({
   routes,
 });
 
-
-
 router.beforeEach((to, from, next) => {
-  // Check if the access token exists in localStorage
-  const accessToken = localStorage.getItem('accessToken');
+  if (to.meta.requiresAuth) {
+    const token = localStorage.getItem('accessToken'); // Get the token from localStorage
 
-  console.log(`Navigating from ${from.path} to ${to.path}. accessToken: ${accessToken}`); // Debugging
+    if (!token) {
+      // If no token is found, redirect to the login page
+      return next('/login');
+    }
 
-  if (to.meta.requiresAuth && !accessToken) {
-    next('/login'); // Redirect to login if not authenticated
-  } else if (to.name === 'Login' && accessToken) {
-    next('/'); // Redirect to dashboard if already logged in
+    // If token exists, allow navigation
+    if (to.path === '/login') {
+      next('/dashboard'); // Redirect authenticated users trying to access login
+    } else {
+      next(); // Allow navigation to the requested route
+    }
   } else {
-    next(); // Proceed to the route
+    next(); // If the route doesn't require authentication, proceed
   }
 });
 

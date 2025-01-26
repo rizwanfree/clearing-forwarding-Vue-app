@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, inject } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const username = ref('');
@@ -34,9 +34,6 @@ const password = ref('');
 const error = ref('');
 const isLoading = ref(false);
 const router = useRouter();
-
-// Inject the updateToken function from App.vue
-const updateToken = inject('updateToken');
 
 async function login() {
   if (!username.value || !password.value) {
@@ -48,7 +45,7 @@ async function login() {
   error.value = '';
 
   try {
-    const response = await fetch('http://localhost:8000/api/accounts/login/', {
+    const response = await fetch('http://127.0.0.1:8000/api/accounts/login/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,14 +58,16 @@ async function login() {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Invalid credentials');
+      throw new Error(errorData.detail || 'Invalid credentials'); // Adjust to match API error response
     }
 
-    const { access } = await response.json();
-    console.log('Login successful. Token:', access);
+    // Parse the response JSON
+    const data = await response.json();
 
-    // Update the token using the provided function
-    updateToken(access);
+    // Save the JWT token (e.g., in localStorage or sessionStorage)
+    localStorage.setItem('accessToken', data.access_token);
+
+    console.log('Login Successful:', data);
 
     // Navigate to the dashboard
     await router.push('/dashboard');
@@ -79,7 +78,6 @@ async function login() {
     isLoading.value = false;
   }
 }
-
 
 </script>
 
