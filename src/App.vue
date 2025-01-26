@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { ref, computed, provide, onUpdated } from 'vue';
+import { ref, computed, provide } from 'vue';
 import SideBar from './components/SideBar.vue';
 import TopBar from './components/TopBar.vue';
 import { useRoute } from 'vue-router';
@@ -29,19 +29,16 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 
-const tenantId = ref(null);
-const userId = ref(null);
+// Create a reactive tenant value
+const tenant = ref(null);
+// Provide the tenant value to all child components
+provide('tenant', tenant);
+//const userId = ref(null);
 
-// Provide tenant_id and user_id to all child components
-provide('tenant_id', tenantId);
-provide('user_id', userId);
+console.log("Tenant in App: " + tenant.value)
 
 // Computed property to check if the current page is the login page
 const isLoginPage = computed(() => route.path === '/login');
-
-onUpdated(() => {
-  console.log(`From App.vue: Tenant Id: ${tenantId.value} AND User ID: ${userId.value}`);
-});
 
 </script>
 

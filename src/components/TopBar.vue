@@ -32,13 +32,17 @@
 import { ref, onMounted, inject } from 'vue';
 
 const userName = ref("");
+//const userId = ref(null);
 
+// Inject the tenant value
+const tenant = inject('tenant');
 
 
 
 async function getUserData() {
-  const token = localStorage.getItem('accessToken'); // Retrieve the JWT token from localStorage
-  //console.log("Access Token from TopBar", localStorage.getItem('accessToken'));
+
+  // Retrieve the JWT token from localStorage
+  const token = localStorage.getItem('accessToken');
 
   if (!token) {
     throw new Error('User is not authenticated. No access token found.');
@@ -63,8 +67,13 @@ async function getUserData() {
     const userData = await response.json();
 
     userName.value = userData.full_name
+    tenant.value = userData.tenant;
+
 
     console.log(userData);
+    // Update the provided tenant value
+
+    console.log('Tenant set in TopBar:', tenant.value);
     return userData;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -104,10 +113,6 @@ async function logout() {
 onMounted(() => {
   getUserData();
 });
-
-
-// Inject the logout function from App.vue
-//const logout = inject('logout');
 </script>
 
 <style scoped>
