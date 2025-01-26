@@ -68,7 +68,7 @@
 
             <v-row class="mb-4">
               <v-col cols="12" md="6">
-                <v-text-field v-model="newUser.name" label="Username" required outlined class="mb-3" disabled>
+                <v-text-field v-model="username" label="Username" required outlined class="mb-3" disabled>
                 </v-text-field>
               </v-col>
               <v-col cols="12" md="6">
@@ -124,7 +124,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject, watch } from 'vue';
+import { ref, inject, watch, onMounted, computed } from 'vue';
 
 const users = ref([]);
 const agent = ref(null);
@@ -132,7 +132,19 @@ const isAddUserModalOpen = ref(false);
 const isEditUserModalOpen = ref(false);
 const isSubmitting = ref(false);
 
+// Add User refs
+const license = ref('');
+const ntn = ref('');
+
+const username = computed(() => {
+  if (!newUser.value.name || !license.value || !ntn.value) {
+    return ''; // Handle empty state gracefully
+  }
+  return `${newUser.value.name}-${license.value}-${ntn.value}`;
+});
+
 const tenant = inject('tenant');
+
 
 // Watch for changes to tenant.value
 watch(tenant, (newTenant) => {
@@ -148,6 +160,7 @@ watch(tenant, (newTenant) => {
 onMounted(() => {
   if (tenant.value) {
     fetchUsers();
+    fetchTenant();
   }
 });
 
@@ -175,13 +188,30 @@ async function fetchUsers() {
     return;
   }
   try {
-    const response = await fetch(`http://localhost:8000/api/accounts/user-list/?tenant=${tenant.value}`);
+    const response = await fetch(`http://localhost:8000/api/accounts/user-list/${tenant.value}/`);
+
     if (!response.ok) {
       throw new Error('Failed to fetch users');
     }
     users.value = await response.json(); // Use .value
   } catch (error) {
     console.error('Error fetching users:', error);
+  }
+}
+
+// Fetch tenant from the API
+async function fetchTenant() {
+  try {
+    const response = await fetch(`http://localhost:8000/api/accounts/agent/${tenant.value}/`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch tenant');
+    }
+    agent.value = await response.json();
+    license.value = agent.value.license;
+    ntn.value = agent.value.ntn;
+    console.log('Agent Data:', license.value, ntn.value);
+  } catch (error) {
+    console.error('Error fetching Agent Data:', error);
   }
 }
 
@@ -217,31 +247,36 @@ function resetNewUserForm() {
 }
 
 // Submit the add user form
-async function submitAddUserForm() {
-  isSubmitting.value = true; // Use .value
+
+const submitAddUserForm = async () => {
+  isSubmitting.value = true; // Use .value with refs
   try {
-    const response = await fetch('http://localhost:3002/users', {
+    const response = await fetch('http://localhost:8000/api/accounts/register/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        ...newUser.value, // Use .value
+        ...newUser.value, // Use .value to access the reactive data
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        tenant_id: agent.value.id
       }),
     });
+
     if (!response.ok) {
       throw new Error('Failed to add user');
     }
+
+    // Close the modal and refresh the user list
     closeAddUserModal();
-    fetchUsers(); // Refresh the user list
+    fetchUsers();
   } catch (error) {
     console.error('Error adding user:', error);
   } finally {
-    isSubmitting.value = false; // Use .value
+    isSubmitting.value = false; // Set submitting to false
   }
-}
+};
 
 // Open the edit user modal
 function openEditUserModal(user) {

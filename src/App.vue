@@ -6,7 +6,7 @@
       <TopBar />
 
       <br>
-      User Id: {{ userId }}
+
       <v-main class="d-flex align-center justify-center">
         <router-view></router-view>
       </v-main>
@@ -33,9 +33,8 @@ const route = useRoute();
 const tenant = ref(null);
 // Provide the tenant value to all child components
 provide('tenant', tenant);
-//const userId = ref(null);
 
-console.log("Tenant in App: " + tenant.value)
+
 
 // Computed property to check if the current page is the login page
 const isLoginPage = computed(() => route.path === '/login');

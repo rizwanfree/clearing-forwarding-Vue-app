@@ -44,40 +44,38 @@ async function getUserData() {
   // Retrieve the JWT token from localStorage
   const token = localStorage.getItem('accessToken');
 
-  if (!token) {
-    throw new Error('User is not authenticated. No access token found.');
-  }
+  if (token) {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/accounts/user/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+        },
+      });
 
-  try {
-    const response = await fetch('http://127.0.0.1:8000/api/accounts/user/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
-      },
-    });
+      if (!response.ok) {
+        // Handle invalid or expired token
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to fetch user data');
+      }
 
-    if (!response.ok) {
-      // Handle invalid or expired token
-      const errorData = await response.json();
-      throw new Error(errorData.detail || 'Failed to fetch user data');
+      // Parse and return the user data
+      const userData = await response.json();
+
+      userName.value = userData.full_name
+      tenant.value = userData.tenant;
+
+
+      console.log(userData);
+      // Update the provided tenant value
+
+      console.log('Tenant set in TopBar:', tenant.value);
+      return userData;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error; // Re-throw the error for the caller to handle
     }
-
-    // Parse and return the user data
-    const userData = await response.json();
-
-    userName.value = userData.full_name
-    tenant.value = userData.tenant;
-
-
-    console.log(userData);
-    // Update the provided tenant value
-
-    console.log('Tenant set in TopBar:', tenant.value);
-    return userData;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error; // Re-throw the error for the caller to handle
   }
 }
 
